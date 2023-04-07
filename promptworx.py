@@ -63,7 +63,7 @@ def gptquery(messages, model="gpt-4", temperature=0.7):
         messages=messages
     )
     resp_text = response['choices'][0]["message"]["content"]
-    print("Response:\n " + resp_text)
+    print("PROCESSING: " + resp_text)
     return resp_text
 
 

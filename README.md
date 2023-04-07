@@ -1,6 +1,13 @@
 # promptworx
 Prompt Worx is a prompt automation solution that provides a framework for introducing automation into prompt responses from ChatGPT.
 
+# WARNING - USE AT YOUR OWN RISK
+This is an experimental library and very likely introduces significant security 
+risks to the environment which is executed - as it basically executes code directly
+from ChatGPT. This code is provided with no warranty. 
+
+Use at your own risk.
+
 # Configuration
 This code requires an Open AI API key. You can set these values in environment variables
 or a .env file. The two variables required are 
