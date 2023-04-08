@@ -2,6 +2,9 @@
 import openai, re, os
 from dotenv import load_dotenv
 
+import eval
+import readfile
+
 load_dotenv()
 
 system_prompt = '''
@@ -15,7 +18,15 @@ any of these commands to respond to the USERQUERY messages.
 You do not have to use a command, and you can use commands multiple
 times. To call commands, respond in the format of [COMMANDNAME] <PARAMETERS>.
 
+For example, to use the EVAL command you would use
+
+[EVAL] 5 + 7
+
 The return of the command will be in the format [COMMANDRETURN] <return value>.
+
+For example
+
+[COMMANDRETURN] 12
 
 When using commands, only use one command and nothing else.
 
@@ -28,11 +39,8 @@ Commands are defined as:
 sample_config = {
     "system" : system_prompt,
     "commands": [
-        {
-            "name": "EVAL",
-            "description": "Executes a simple python expression and returns the value.",
-            "format": "EVAL <expression>",
-        }
+        eval.definition,
+        readfile.definition
     ]
 }
 
@@ -66,6 +74,8 @@ def gptquery(messages, model="gpt-4", temperature=0.7):
     print("PROCESSING: " + resp_text)
     return resp_text
 
+def wrap(s, w):
+    return [s[i:i + w] for i in range(0, len(s), w)]
 
 def queryloop(messages):
     while True:
@@ -79,10 +89,17 @@ def queryloop(messages):
                 if command_match:
                     param_string = command_match.groups()[0]
                     try:
-                        ret_string = f"[COMMANDRETURN] {eval(param_string)}"
+                        ret_text = wrap(command['call'](param_string), 3000)
+                        for chunk in ret_text[:6]:
+                            ret_string = f"[COMMANDRETURN] {chunk}"
+                            print(ret_string)
+                            messages = add_message("user", ret_string, messages)
                     except BaseException as e:
                         ret_string = f"[COMMANDRETURN] {str(e)}"
-                    messages = add_message("user", ret_string, messages)
+                        print(ret_string)
+                        messages = add_message("user", ret_string, messages)
+
+
 
 
 def userquery(query_text):
