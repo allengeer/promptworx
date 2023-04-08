@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 
 import eval
 import readfile
+import writefile
 
 load_dotenv()
 
@@ -40,7 +41,8 @@ sample_config = {
     "system" : system_prompt,
     "commands": [
         eval.definition,
-        readfile.definition
+        readfile.definition,
+        writefile.definition
     ]
 }
 
@@ -87,10 +89,13 @@ def queryloop(messages):
             for command in sample_config["commands"]:
                 command_match = re.match(f"\[{command['name']}\] (.+)", resp)
                 if command_match:
-                    param_string = command_match.groups()[0]
+                    if (command['name'] == "WRITEFILE"):
+                        param_string = resp
+                    else:
+                        param_string = command_match.groups()[0]
                     try:
                         ret_text = wrap(command['call'](param_string), 3000)
-                        for chunk in ret_text[:6]:
+                        for chunk in ret_text[:min(6, len(ret_text))]:
                             ret_string = f"[COMMANDRETURN] {chunk}"
                             print(ret_string)
                             messages = add_message("user", ret_string, messages)

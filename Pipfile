@@ -7,6 +7,7 @@ name = "pypi"
 openai = "*"
 python-dotenv = "*"
 pypdf = "*"
+python-docx = "*"
 
 [dev-packages]
 
